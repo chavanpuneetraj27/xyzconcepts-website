@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output — produced by CI and published to the `deploy` branch,
+# never committed to main.
+dist/
+
+# Logs and caches
+*.log
+.vite/
+*.tsbuildinfo
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Local environment
+.env
+.env.local
+.env.*.local

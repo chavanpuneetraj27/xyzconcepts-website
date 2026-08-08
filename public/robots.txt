@@ -1,0 +1,10 @@
+# XYZconcepts — https://xyzconcepts.com
+# Everything on this site is public and indexable.
+
+User-agent: *
+Allow: /
+
+# Build artefacts have hashed filenames and no standalone value in search.
+Disallow: /assets/
+
+Sitemap: https://xyzconcepts.com/sitemap.xml

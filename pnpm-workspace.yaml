@@ -1,0 +1,9 @@
+# esbuild and sharp ship prebuilt native binaries and need their install
+# scripts to run. Declared here so CI installs are non-interactive.
+allowBuilds:
+  esbuild: true
+  sharp: true
+
+onlyBuiltDependencies:
+  - esbuild
+  - sharp

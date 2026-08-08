@@ -1,0 +1,15 @@
+{
+  "name": "XYZconcepts — Event Management, Hyderabad",
+  "short_name": "XYZconcepts",
+  "description": "Corporate events, weddings, social celebrations and brand activations designed and executed from Hyderabad, India.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FFC107",
+  "theme_color": "#FFC107",
+  "lang": "en-IN",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/logo-black.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
