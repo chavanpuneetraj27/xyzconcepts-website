@@ -194,9 +194,13 @@ for (const page of PAGES) {
   seenDescriptions.set(page.description, page.path);
 }
 
-for (const required of ["robots.txt", ".htaccess", "opengraph.jpg", "favicon.svg"]) {
+for (const required of ["robots.txt", "opengraph.jpg", "favicon.svg", "site.webmanifest"]) {
   if (!existsSync(join(dist, required))) failures.push(`${required} missing from dist`);
 }
+
+// Hosting config lives at the repo root, not in dist, but a build that produced
+// no routing rules would silently ship broken redirects and caching.
+if (!existsSync(join(root, "vercel.json"))) failures.push("vercel.json missing from the repo root");
 
 const robots = existsSync(join(dist, "robots.txt")) ? readFileSync(join(dist, "robots.txt"), "utf8") : "";
 if (robots && !robots.includes(`${SITE_URL}/sitemap.xml`))

@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "description": "XYZconcepts — event management and design agency in Hyderabad, India.",
-  "packageManager": "pnpm@11.0.9",
   "scripts": {
     "dev": "vite",
     "build": "vite build && node scripts/postbuild.mjs",

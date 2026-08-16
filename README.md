@@ -80,18 +80,39 @@ outside 110–165 characters, missing JSON-LD, or if `robots.txt`, `.htaccess`,
 
 ## Deployment
 
-Hostinger shared hosting, served from `public_html`.
+**Vercel**, building directly from `main`. Push to `main` and Vercel builds and
+deploys; pull requests get their own preview URL. There is no publish branch and
+no deploy step to run by hand.
 
-`main` holds the source. GitHub Actions
-([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) builds every
-push to `main` and force-pushes `dist/` to the **`deploy`** branch. Hostinger's
-Git integration is pointed at `deploy`, so that branch *is* the web root.
+[`vercel.json`](vercel.json) holds the hosting config: clean URLs, the
+`www` → apex redirect, cache headers and security headers. Vercel serves HTTPS
+itself, so unlike the Apache setup this replaced there is no HTTPS redirect rule.
 
-Never commit to `deploy` by hand — it is overwritten on every build.
+`dist/404.html` is served with a real 404 status for unknown paths — deliberately
+not a rewrite to the SPA shell, which would produce a soft 404.
 
-[`public/.htaccess`](public/.htaccess) ships with the build and handles the
-canonical host (HTTPS, non-www), clean URLs without redirect hops, compression,
-cache headers, security headers and the 404 document.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) type checks and builds on
+every push and PR. It publishes nothing; it exists so a broken build or a
+regressed SEO invariant is caught independently of Vercel.
+
+### Domain
+
+`xyzconcepts.com` is registered at Hostinger and resolves via Hostinger DNS;
+only the records point at Vercel. Both the apex and `www` must be added as
+domains in the Vercel project, with the apex primary — the redirect in
+`vercel.json` only fires for requests that actually reach the project.
+
+Changing the canonical hostname means editing three places: `SITE_URL` in
+`src/seo/config.ts`, the redirect in `vercel.json`, and the Vercel domain
+settings.
+
+### pnpm version
+
+`packageManager` is deliberately **not** pinned in `package.json`. Vercel's
+builder does not recognise pnpm 11 and fails the install if it is pinned there.
+The lockfile (`lockfileVersion: 9.0`) is what actually pins dependency versions.
+`pnpm-workspace.yaml` carries both `allowBuilds` (pnpm 11) and
+`onlyBuiltDependencies` (pnpm 9/10) so esbuild and sharp compile on any of them.
 
 ---
 
