@@ -2,19 +2,66 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { PhoneCall, Mail, Instagram, MapPin } from "lucide-react";
 
+/** Enquiries are delivered here. Both are already public elsewhere on the site. */
+const ENQUIRY_WHATSAPP = "919063377915";
+const ENQUIRY_EMAIL = "connect@xyzconcepts.com";
+
+type EnquiryForm = {
+  name: string; email: string; phone: string;
+  eventType: string; date: string; guests: string; message: string;
+};
+
+/**
+ * Human-readable enquiry, used for both the WhatsApp and the email body.
+ * Optional fields are omitted entirely rather than sent as empty labels.
+ */
+function formatEnquiry(form: EnquiryForm): string {
+  const lines = [
+    "New event enquiry from xyzconcepts.com",
+    "",
+    `Name: ${form.name}`,
+    `Email: ${form.email}`,
+  ];
+  if (form.phone) lines.push(`Phone: ${form.phone}`);
+  lines.push(`Event type: ${form.eventType}`);
+  if (form.date) lines.push(`Event date: ${form.date}`);
+  if (form.guests) lines.push(`Estimated guests: ${form.guests}`);
+  if (form.message) lines.push("", `Vision: ${form.message}`);
+  return lines.join("\n");
+}
+
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", phone: "", eventType: "", date: "", guests: "", message: "" });
+  const [form, setForm] = useState<EnquiryForm>({ name: "", email: "", phone: "", eventType: "", date: "", guests: "", message: "" });
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const enquiryText = formatEnquiry(form);
+  const whatsappHref = `https://wa.me/${ENQUIRY_WHATSAPP}?text=${encodeURIComponent(enquiryText)}`;
+  const mailtoHref =
+    `mailto:${ENQUIRY_EMAIL}` +
+    `?subject=${encodeURIComponent(`Event enquiry — ${form.name || "website"}`)}` +
+    `&body=${encodeURIComponent(enquiryText)}`;
+
+  /**
+   * Hands the enquiry off to WhatsApp, pre-filled and ready to send.
+   *
+   * This form previously faked a submission — it waited a second, showed a
+   * success screen and discarded everything typed into it. There is no backend
+   * in this project to post to, so the enquiry is routed to the channel the
+   * business already runs on. window.open is called synchronously inside the
+   * submit handler so it counts as a user gesture and is not blocked, and the
+   * success screen still offers both channels in case the handoff fails.
+   */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSubmitted(true); }, 1000);
+    window.open(whatsappHref, "_blank", "noopener,noreferrer");
+    setLoading(false);
+    setSubmitted(true);
   };
 
   const contactInfo = [
@@ -107,9 +154,21 @@ export default function Contact() {
                 transition={{ duration: 0.5 }}
               >
                 <div className="text-black text-7xl mb-6" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>✓</div>
-                <h3 className="text-black text-4xl mb-4" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Got Your Enquiry!</h3>
+                <h3 className="text-black text-4xl mb-4" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Almost There!</h3>
                 <p className="text-black/70 text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-                  Shreya or Vaishali will be in touch within 24 hours. Can't wait to start building your vision!
+                  We've opened WhatsApp with your enquiry ready to go — just hit send and
+                  Shreya or Vaishali will be in touch within 24 hours.
+                </p>
+                <p className="text-black/60 text-sm mt-6" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  WhatsApp didn't open?{" "}
+                  <a href={whatsappHref} target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-black">
+                    Try again
+                  </a>{" "}
+                  or{" "}
+                  <a href={mailtoHref} className="underline font-semibold hover:text-black">
+                    send it by email
+                  </a>
+                  .
                 </p>
               </motion.div>
             ) : (
@@ -188,7 +247,7 @@ export default function Contact() {
                   className="w-full bg-[#111] text-white py-5 text-sm tracking-[0.2em] uppercase font-bold hover:bg-[#FFC107] hover:text-black transition-colors duration-300 cursor-pointer disabled:opacity-60"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  {loading ? "Sending..." : "Send Enquiry →"}
+                  {loading ? "Opening WhatsApp..." : "Send Enquiry →"}
                 </button>
               </motion.form>
             )}
