@@ -73,8 +73,11 @@ HTML and the runtime tags cannot drift apart.
 
 `pnpm build` **fails** if any route has a missing or wrong canonical, a
 duplicated title or description, a title over 65 characters, a description
-outside 110–165 characters, missing JSON-LD, or if `robots.txt`, `.htaccess`,
-`favicon.svg` or `opengraph.jpg` did not reach `dist/`.
+outside 110–165 characters, missing JSON-LD, or if `robots.txt`, `favicon.svg`,
+`opengraph.jpg` or `site.webmanifest` did not reach `dist/`.
+
+Note that `vercel.json` must contain no `//` comment keys. Vercel's config
+schema rejects unknown properties and the deployment fails outright.
 
 ---
 
