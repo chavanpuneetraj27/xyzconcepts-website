@@ -3,15 +3,11 @@
   "framework": "vite",
   "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
-
-  "//": "Replaces the Apache .htaccess this project used before moving to Vercel. Vercel terminates TLS and serves HTTPS itself, so no HTTPS redirect rule is needed here.",
-
   "cleanUrls": true,
   "trailingSlash": false,
 
   "redirects": [
     {
-      "//": "Exactly one hostname must serve the site or Google splits ranking signals between duplicates. Apex is canonical, matching the <link rel=canonical> tags. www must also be added as a domain in the Vercel project or requests to it never reach this rule.",
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "www.xyzconcepts.com" }],
       "destination": "https://xyzconcepts.com/$1",
@@ -21,12 +17,10 @@
 
   "headers": [
     {
-      "//": "Vite fingerprints everything under /assets, so those files are immutable and can be cached for a year.",
       "source": "/assets/(.*)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     },
     {
-      "//": "Unhashed files in public/ change in place, so they need revalidation.",
       "source": "/(favicon.svg|logo-black.png|logo-white.png|opengraph.jpg|site.webmanifest)",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, must-revalidate" }]
     },
