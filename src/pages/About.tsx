@@ -43,7 +43,8 @@ function Story() {
         <div className="lg:col-span-4">
           <div className="lg:sticky lg:top-32">
             <FadeUp><p className="eyebrow text-sun-deep mb-6">The Origin</p></FadeUp>
-            <RevealLines as="h2" text={["Not just", "another", "beginning."]} className="display-lg text-ink" />
+            {/* Sized to the 4-column sticky rail, not the viewport — display-lg overflows it on desktop. */}
+            <RevealLines as="h2" text={["Not just", "another", "beginning."]} className="display-lg text-ink" style={{ fontSize: "clamp(2.5rem, 5.5vw, 6.5rem)" }} />
             <div className="hidden lg:block mt-12 w-px h-40 bg-ink/10 relative">
               <motion.div className="absolute inset-x-0 top-0 h-full bg-ink origin-top" style={{ scaleY }} />
             </div>

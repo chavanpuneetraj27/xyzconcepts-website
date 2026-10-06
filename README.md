@@ -3,8 +3,8 @@
 Marketing site for [XYZconcepts](https://xyzconcepts.com), an event management
 and event design company in Hyderabad, India.
 
-React 19 + Vite + Tailwind v4 + Framer Motion, routed with Wouter. Pure static
-output — no backend, no database.
+React 19 + Vite + Tailwind v4 + Framer Motion + Lenis, routed with Wouter. Pure
+static output — no backend, no database.
 
 ---
 
@@ -78,6 +78,43 @@ outside 110–165 characters, missing JSON-LD, or if `robots.txt`, `favicon.svg`
 
 Note that `vercel.json` must contain no `//` comment keys. Vercel's config
 schema rejects unknown properties and the deployment fails outright.
+
+---
+
+## Design and motion system
+
+The site is a dark "stage": near-black (`ink`), white (`paper`), and
+`#FFC107` (`sun`) used as light — accents, highlights, the occasional
+spotlight section — not as a flat fill. Display type is Bebas Neue; body is
+DM Sans. Tokens, fluid type sizes and spacing live in
+[`src/index.css`](src/index.css) (`display-xl/lg/md/sm`, `eyebrow`,
+`container-x`, `section-y`).
+
+Timing comes from one place, [`src/lib/motion.ts`](src/lib/motion.ts), so the
+whole site moves with the same accent. The reusable pieces are in
+[`src/components/motion/`](src/components/motion/):
+
+| Component | What it does |
+|---|---|
+| `SmoothScroll` | Lenis inertial scrolling. Native on touch; off under `prefers-reduced-motion`. |
+| `Reveal` | `RevealLines` (masked line reveal), `RevealWords`, `ScrubText` (words brighten with scroll), `FadeUp`, `DrawLine`. |
+| `Parallax` | `ParallaxImage`, `ParallaxLayer`, `useHeroParallax`. |
+| `HorizontalScroll` | Pinned sideways gallery on desktop; native snap row on touch. |
+| `StackCards` | Sticky panels that recede as the next one slides over. |
+| `Marquee` | Velocity-reactive; speeds up and reverses with scroll. |
+| `Magnetic`, `Counter` | Cursor-magnetic wrapper (desktop only); in-view count-up. |
+
+`useRichMotion()` gates anything that only makes sense with a real pointer and a
+desktop viewport. Mobile gets purpose-built fallbacks, never a disabled effect.
+
+Two deliberate choices worth knowing:
+
+- **The preloader plays once per session** (`sessionStorage`). Replaying a
+  1.5s intro on every route would push LCP out of the "good" band on every
+  page — a direct ranking cost.
+- **Outlined text (`.text-outline`) needs an explicit stroke colour.**
+  `currentColor` resolves against the element's own `color: transparent` and
+  vanishes. Use `.text-outline-ink` on light backgrounds.
 
 ---
 
