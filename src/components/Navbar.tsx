@@ -1,153 +1,142 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useMotionValueEvent } from "framer-motion";
 import LogoMark from "@/components/LogoMark";
+import { EASE_STAGE } from "@/lib/motion";
+import { lenisRef } from "@/lib/motion";
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/corporate-events", label: "Corporate" },
-  { href: "/social-events", label: "Social Events" },
+  { href: "/social-events", label: "Social" },
+  { href: "/portfolio", label: "Portfolio" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
 
+/**
+ * Transparent over heroes. Once the page scrolls it gains a frosted dark bar,
+ * hides while scrolling down and returns the moment the user scrolls up — so
+ * it is never in the way of the content but always one gesture away.
+ */
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { scrollY } = useScroll();
 
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const prev = scrollY.getPrevious() ?? 0;
+    setScrolled(y > 40);
+    setHidden(y > 160 && y > prev && !menuOpen);
+  });
+
+  useEffect(() => setMenuOpen(false), [location]);
+
+  // Freeze the page behind the full-screen menu.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => { setMenuOpen(false); }, [location]);
-
-  const linkBaseCls = scrolled ? "text-[#111]/80 hover:text-[#111] font-semibold" : "text-white/90 hover:text-white font-semibold";
-  const linkActiveCls = scrolled ? "text-[#111] font-bold" : "text-white font-bold";
-  const hamburgerCls = scrolled ? "bg-[#111]" : "bg-white";
+    const l = lenisRef.current;
+    if (menuOpen) l?.stop();
+    else l?.start();
+    document.documentElement.style.overflow = menuOpen ? "hidden" : "";
+    return () => {
+      document.documentElement.style.overflow = "";
+    };
+  }, [menuOpen]);
 
   return (
     <>
-      <header
-        className={`fixed top-0 left-0 right-0 z-[200] transition-all duration-500 ${
-          scrolled
-            ? "bg-white/96 backdrop-blur-md shadow-sm border-b border-[#111]/8"
-            : "bg-transparent"
-        }`}
+      {/* Above the full-screen menu (z-300) so the logo and close button stay reachable while it is open. */}
+      <motion.header
+        className="fixed top-0 left-0 right-0 z-[320]"
+        animate={{ y: hidden ? "-100%" : "0%" }}
+        transition={{ duration: 0.5, ease: EASE_STAGE }}
       >
-        <div className="max-w-7xl mx-auto px-6 lg:pl-4 lg:pr-10 h-18 flex items-center justify-between">
-          <Link href="/">
-            {/* Logo adapts: white "xyz" on dark hero, black "xyz" on white scrolled navbar */}
-            <LogoMark
-              xyzColor={scrolled ? "text-[#111]" : "text-white"}
-              size="md"
-            />
-          </Link>
+        <div
+          className={`transition-[background-color,backdrop-filter,border-color] duration-500 border-b ${
+            scrolled && !menuOpen ? "bg-ink/75 backdrop-blur-xl border-white/8" : "bg-transparent border-transparent"
+          }`}
+        >
+          <div className="container-x h-[76px] md:h-[88px] flex items-center justify-between">
+            <Link href="/" aria-label="XYZconcepts — home" className="relative z-[310] -ml-3 md:-ml-4">
+              <LogoMark size="md" />
+            </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden lg:flex items-center gap-10">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                <span
-                  className={`relative text-[11px] tracking-[0.22em] uppercase cursor-pointer transition-colors duration-300 group ${
-                    location === link.href ? linkActiveCls : linkBaseCls
-                  }`}
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {link.label}
-                  <span
-                    className={`absolute -bottom-1.5 left-0 h-[2px] bg-[#FFC107] transition-all duration-300 ${
-                      location === link.href ? "w-full" : "w-0 group-hover:w-full"
-                    }`}
-                  />
-                </span>
-              </Link>
-            ))}
-            <Link href="/contact">
-              <span
-                className={`px-5 py-2.5 text-[11px] tracking-[0.2em] uppercase font-semibold cursor-pointer transition-all duration-300 ${
-                  scrolled
-                    ? "bg-[#111] text-white hover:bg-[#FFC107] hover:text-black"
-                    : "bg-white text-black hover:bg-[#FFC107]"
-                }`}
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+            <nav className="hidden lg:flex items-center gap-9" aria-label="Primary">
+              {navLinks.map((link) => {
+                const active = location === link.href;
+                return (
+                  <Link key={link.href} href={link.href} className="group relative py-2 eyebrow text-[0.66rem] text-white/80 hover:text-white transition-colors">
+                    {link.label}
+                    <span
+                      className={`absolute left-0 -bottom-0.5 h-px bg-sun transition-all duration-500 [transition-timing-function:cubic-bezier(0.76,0,0.24,1)] ${
+                        active ? "w-full" : "w-0 group-hover:w-full"
+                      }`}
+                    />
+                  </Link>
+                );
+              })}
+              <Link
+                href="/contact"
+                className="group relative overflow-hidden ml-2 px-6 py-3 eyebrow text-[0.66rem] text-ink bg-sun isolate before:absolute before:inset-0 before:-z-10 before:bg-paper before:origin-bottom before:scale-y-0 before:transition-transform before:duration-500 before:[transition-timing-function:cubic-bezier(0.76,0,0.24,1)] hover:before:scale-y-100"
               >
                 Let's Talk
-              </span>
-            </Link>
-          </nav>
+              </Link>
+            </nav>
 
-          {/* Mobile hamburger */}
-          <button
-            className="lg:hidden z-[300] w-8 h-8 flex flex-col justify-center gap-[6px] relative"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle menu"
-          >
-            <motion.span
-              className={`block w-full h-[2px] origin-center transition-colors duration-300 ${hamburgerCls}`}
-              animate={menuOpen ? { rotate: 45, y: 8 } : { rotate: 0, y: 0 }}
-              transition={{ duration: 0.3 }}
-            />
-            <motion.span
-              className={`block w-full h-[2px] transition-colors duration-300 ${hamburgerCls}`}
-              animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
-              transition={{ duration: 0.2 }}
-            />
-            <motion.span
-              className={`block w-full h-[2px] origin-center transition-colors duration-300 ${hamburgerCls}`}
-              animate={menuOpen ? { rotate: -45, y: -8 } : { rotate: 0, y: 0 }}
-              transition={{ duration: 0.3 }}
-            />
-          </button>
+            <button
+              className="lg:hidden relative z-[310] w-12 h-12 -mr-3 flex flex-col items-center justify-center gap-[7px]"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+            >
+              <motion.span className="block w-7 h-[2px] bg-white origin-center" animate={menuOpen ? { rotate: 45, y: 4.5 } : { rotate: 0, y: 0 }} transition={{ duration: 0.4, ease: EASE_STAGE }} />
+              <motion.span className="block w-7 h-[2px] bg-white origin-center" animate={menuOpen ? { rotate: -45, y: -4.5 } : { rotate: 0, y: 0 }} transition={{ duration: 0.4, ease: EASE_STAGE }} />
+            </button>
+          </div>
         </div>
-      </header>
+      </motion.header>
 
-      {/* Full-screen mobile menu */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="fixed inset-0 z-[150] bg-[#111] flex flex-col items-center justify-center overflow-hidden"
-            initial={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
-            animate={{ opacity: 1, clipPath: "inset(0 0 0% 0)" }}
-            exit={{ opacity: 0, clipPath: "inset(0 0 100% 0)" }}
-            transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+            className="fixed inset-0 z-[300] bg-ink flex flex-col justify-between noise"
+            initial={{ clipPath: "inset(0 0 100% 0)" }}
+            animate={{ clipPath: "inset(0 0 0% 0)" }}
+            exit={{ clipPath: "inset(0 0 100% 0)" }}
+            transition={{ duration: 0.7, ease: EASE_STAGE }}
           >
-            <nav className="flex flex-col items-center gap-2 relative z-10">
+            <div className="h-[76px]" />
+            <nav className="container-x flex flex-col gap-1" aria-label="Mobile">
               {navLinks.map((link, i) => (
-                <Link key={link.href} href={link.href}>
-                  <motion.span
-                    className="block text-white cursor-pointer hover:text-[#FFC107] transition-colors duration-200"
-                    style={{
-                      fontFamily: "'Bebas Neue', sans-serif",
-                      fontSize: "clamp(2.5rem, 10vw, 5rem)",
-                      letterSpacing: "0.05em",
-                    }}
-                    initial={{ opacity: 0, y: 40 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.12 + i * 0.07, duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+                <div key={link.href} className="clip">
+                  <motion.div
+                    initial={{ y: "110%" }}
+                    animate={{ y: "0%" }}
+                    exit={{ y: "110%" }}
+                    transition={{ duration: 0.8, delay: 0.15 + i * 0.06, ease: EASE_STAGE }}
                   >
-                    {link.label}
-                  </motion.span>
-                </Link>
+                    <Link href={link.href} className="group flex items-baseline gap-5 py-1">
+                      <span className="eyebrow text-sun text-[0.6rem]">0{i + 1}</span>
+                      <span className={`display-lg text-white transition-colors ${location === link.href ? "text-sun" : "group-hover:text-sun"}`} style={{ fontSize: "clamp(2.75rem, 11vw, 6rem)" }}>
+                        {link.label}
+                      </span>
+                    </Link>
+                  </motion.div>
+                </div>
               ))}
             </nav>
-
-            {/* Logo at bottom of mobile menu */}
             <motion.div
-              className="absolute bottom-8 flex flex-col items-center gap-3"
+              className="container-x pb-10 flex flex-col gap-3 text-white/50 text-sm font-body"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.65 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
             >
-              <LogoMark xyzColor="text-white" size="sm" />
-              <p
-                className="text-white/30 text-xs tracking-[0.3em] uppercase"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                Hyderabad, India
-              </p>
+              <a href="https://wa.me/919063377915" className="hover:text-sun transition-colors">+91 90633 77915</a>
+              <a href="mailto:connect@xyzconcepts.com" className="hover:text-sun transition-colors">connect@xyzconcepts.com</a>
+              <span className="eyebrow text-[0.6rem] text-white/30 mt-2">Hyderabad, India</span>
             </motion.div>
           </motion.div>
         )}

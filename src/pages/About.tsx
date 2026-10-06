@@ -1,174 +1,215 @@
-import { useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { Link } from "wouter";
+import { useRef, type MouseEvent } from "react";
+import { motion, useMotionValue, useSpring, useTransform, useScroll } from "framer-motion";
 
-import shreyaImg from "@assets/WhatsApp_Image_2026-04-28_at_22.00.28_1777396607970.jpeg?w=600&format=webp&quality=85";
-import vaishaliImg from "@assets/WhatsApp_Image_2026-04-28_at_22.00.29_1777396645919.jpeg?w=600&format=webp&quality=85";
-import aboutHeroImg from "@assets/DSC_0891.JPG_1777461996111.jpeg?w=1400&format=webp&quality=90";
+import heroImg from "@assets/DSC_0891.JPG_1777461996111.jpeg?w=1600&format=webp&quality=86";
+import shreyaImg from "@assets/WhatsApp_Image_2026-04-28_at_22.00.28_1777396607970.jpeg?w=900&format=webp&quality=84";
+import vaishaliImg from "@assets/WhatsApp_Image_2026-04-28_at_22.00.29_1777396645919.jpeg?w=900&format=webp&quality=84";
 
-const HERO_IMG = aboutHeroImg;
-const FOUNDER_1_IMG = shreyaImg;
-const FOUNDER_2_IMG = vaishaliImg;
+import PageHero from "@/components/PageHero";
+import SectionHeading from "@/components/SectionHeading";
+import Button from "@/components/Button";
+import { RevealLines, RevealWords, FadeUp, DrawLine } from "@/components/motion/Reveal";
+import { useRichMotion } from "@/lib/motion";
 
-
-const beliefs = [
-  { num: "01", text: "EVERY DETAIL. EVERY MOMENT. EVERY GUEST. CONSIDERED." },
-  { num: "02", text: "SEAMLESS EXPERIENCES DON'T JUST HAPPEN. THEY'RE PLANNED." },
-  { num: "03", text: "SIZE OF EVENT CHANGES. OUR STANDARDS DON'T." },
-  { num: "04", text: "EVERY PROBLEM HAS A SOLUTION BEFORE IT BECOMES ONE." },
-  { num: "05", text: "CLIENT SATISFACTION IS THE ONLY STANDING OVATION WE NEED." },
+const STORY = [
+  "Some callings don't knock; they pull. We began with engineering textbooks in hand, but our minds were always somewhere else, on stages, in crowds, in the chaos that makes an event come alive. From different cities and different colleges, we were unknowingly shaped by the same instinct to run toward every fest, every setup, every moment that needed someone to take charge. We didn't choose events; events chose us.",
+  "One of us had already stepped into the world of events, while the other was quietly learning, observing, and mastering every detail, on different paths but in the same direction. Then came Mira IMS, the right place at the right time, where those paths finally crossed. And when we started working together, it didn't feel like work; it felt like everything had aligned.",
+  "What people don't see are the 3AM setups, the last-minute changes, the endless coordination that tests every limit you have, but that's where we were built. Chaos taught us composure, and pressure gave us clarity. Somewhere in between all of it, XYZconcepts was born, not just as a company, but as a reflection of everything we believe events should be, intentional, immersive, and flawlessly executed. For us, it's about turning ideas into experiences and making every event feel personal, seamless, and unforgettable.",
+  "Because for us, this was never just a career, and it never will be.",
 ];
 
+const FOUNDERS = [
+  { name: "Shreya", role: "Co-founder & Experience Designer", img: shreyaImg, pos: "center top" },
+  { name: "Vaishali", role: "Co-founder & Creative Director", img: vaishaliImg, pos: "center 20%" },
+];
 
-function BeliefsSection() {
+const BELIEFS = [
+  "Every detail. Every moment. Every guest. Considered.",
+  "Seamless experiences don't just happen. They're planned.",
+  "Size of event changes. Our standards don't.",
+  "Every problem has a solution before it becomes one.",
+  "Client satisfaction is the only standing ovation we need.",
+];
+
+/** Origin story: sticky chapter marker on the left, paragraphs unfolding on the right. */
+function Story() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.7", "end 0.7"] });
+  const scaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
   return (
-    <section className="py-32 px-6 lg:px-10 bg-white">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-20">
-          <p className="text-[#FFC107] text-xs tracking-[0.4em] uppercase mb-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>What We Stand For</p>
-          <h2 className="text-[#111] text-6xl md:text-8xl leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Five Things<br />We Believe</h2>
+    <section className="relative bg-paper text-ink">
+      <div className="container-x section-y grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+        <div className="lg:col-span-4">
+          <div className="lg:sticky lg:top-32">
+            <FadeUp><p className="eyebrow text-sun-deep mb-6">The Origin</p></FadeUp>
+            <RevealLines as="h2" text={["Not just", "another", "beginning."]} className="display-lg text-ink" />
+            <div className="hidden lg:block mt-12 w-px h-40 bg-ink/10 relative">
+              <motion.div className="absolute inset-x-0 top-0 h-full bg-ink origin-top" style={{ scaleY }} />
+            </div>
+          </div>
         </div>
-        <div className="space-y-0">
-          {beliefs.map((b, i) => (
-            <motion.div
-              key={i}
-              className="border-t border-[#111]/8 py-8 flex items-start gap-6"
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.55, delay: i * 0.1 }}
-            >
-              <span className="text-[#FFC107] text-sm flex-none mt-1.5 font-bold" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "0.1em" }}>{b.num}</span>
-              <div className="w-[2px] self-stretch bg-[#FFC107]/25 flex-none" />
-              <h3 className="text-[#111] flex-1 leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(1.4rem, 3.8vw, 3rem)", letterSpacing: "0.04em" }}>
-                {b.text}
-              </h3>
-            </motion.div>
+
+        <div ref={ref} className="lg:col-span-7 lg:col-start-6 flex flex-col gap-10 md:gap-12">
+          {STORY.map((p, i) => (
+            <FadeUp key={i} delay={0.05} amount={0.2}>
+              <p className={`font-body leading-relaxed text-ink/80 ${i === 0 ? "text-xl md:text-2xl first-letter:display-lg first-letter:float-left first-letter:mr-3 first-letter:leading-[0.8] first-letter:text-sun-deep" : "text-lg md:text-xl"} ${i === STORY.length - 1 ? "italic text-ink" : ""}`}>
+                {p}
+              </p>
+            </FadeUp>
           ))}
-          <div className="border-t border-[#111]/8" />
+
+          <FadeUp className="border-l-2 border-sun pl-6 md:pl-8 py-2">
+            <p className="font-body text-ink/60 text-base md:text-lg leading-relaxed">
+              And to the one who believed in us before we believed in ourselves —
+              <span className="block mt-2 text-ink font-semibold">Captain Anand Dandapani</span>
+              <span className="eyebrow text-[0.58rem] text-ink/45">Founder &amp; CEO, Mira IMS Pvt Ltd</span>
+            </p>
+          </FadeUp>
+
+          <div className="pt-8 md:pt-12 border-t border-ink/10">
+            <RevealWords text="Born backstage. Built for the spotlight." className="display-md text-ink" />
+            <FadeUp delay={0.3}><p className="eyebrow text-ink/50 mt-5">XYZconcepts — Your search ends WITH US, literally!</p></FadeUp>
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-export default function About() {
-  const { scrollY } = useScroll();
-  const parallaxY = useTransform(scrollY, [0, 700], [0, 180]);
-  const founderRef = useRef(null);
-  const founderInView = useInView(founderRef, { once: true, amount: 0.15 });
+/** Portrait that tilts toward the cursor on desktop; plain on touch. */
+function FounderCard({ f, i }: { f: (typeof FOUNDERS)[number]; i: number }) {
+  const rich = useRichMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const rx = useMotionValue(0);
+  const ry = useMotionValue(0);
+  const srx = useSpring(rx, { stiffness: 140, damping: 18 });
+  const sry = useSpring(ry, { stiffness: 140, damping: 18 });
+
+  const onMove = (e: MouseEvent<HTMLDivElement>) => {
+    if (!rich || !ref.current) return;
+    const r = ref.current.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5;
+    const py = (e.clientY - r.top) / r.height - 0.5;
+    ry.set(px * 10);
+    rx.set(-py * 10);
+  };
+  const reset = () => {
+    rx.set(0);
+    ry.set(0);
+  };
 
   return (
-    <div className="overflow-x-hidden bg-white">
-      {/* Hero */}
-      <section className="relative min-h-screen flex flex-col justify-end overflow-hidden pb-24">
-        <motion.div className="absolute inset-0 w-full h-[118%] -top-[9%]" style={{ y: parallaxY }}>
-          <img src={HERO_IMG} alt="The XYZconcepts team on site at an event in Hyderabad" className="w-full h-full object-cover" style={{ objectPosition: "center 20%" }} fetchPriority="high" decoding="async" />
-          {/* bottom fade for text legibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/5" />
-          {/* right-side fade so text is readable without covering the people */}
-          <div className="absolute inset-0 hidden lg:block bg-gradient-to-l from-black/85 via-black/40 to-transparent" style={{ left: "40%" }} />
-        </motion.div>
-
-        {/* Text: full-width on mobile, right 48% on desktop */}
-        <div className="relative z-10 w-full px-6 lg:px-10 pt-32 flex flex-col items-center text-center lg:items-end lg:text-right lg:ml-auto lg:w-[52%] lg:self-end">
-          <motion.p className="text-[#FFC107] text-xs tracking-[0.4em] uppercase mb-8" style={{ fontFamily: "'DM Sans', sans-serif" }} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>The Story</motion.p>
-          <div className="overflow-hidden w-full">
-            <motion.h1
-              className="text-white leading-none"
-              style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2rem, 5.5vw, 6rem)" }}
-              initial={{ y: 110, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.85, delay: 0.12, ease: [0.76, 0, 0.24, 1] }}
-            >
-              Built By Two Women Who Refuse To Do Ordinary.
-            </motion.h1>
-          </div>
-          <motion.p className="text-white/55 text-lg italic mt-8 leading-snug" style={{ fontFamily: "'DM Sans', sans-serif" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.65 }}>
-            Shreya & Vaishali, Co-founders<br />
-            <span className="not-italic font-semibold text-white/70">—XYZconcepts</span>
-          </motion.p>
+    <FadeUp delay={i * 0.15} className="[perspective:1200px]">
+      <motion.div
+        ref={ref}
+        className="group relative overflow-hidden bg-ink-3 duotone-wrap"
+        style={{ rotateX: srx, rotateY: sry, transformStyle: "preserve-3d" }}
+        onMouseMove={onMove}
+        onMouseLeave={reset}
+      >
+        <div className="aspect-[4/5] overflow-hidden">
+          <img
+            src={f.img}
+            alt={`${f.name}, ${f.role} at XYZconcepts`}
+            className="duotone w-full h-full object-cover transition-transform duration-[1.4s] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
+            style={{ objectPosition: f.pos }}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+          />
         </div>
-      </section>
-
-      {/* Origin Story */}
-      <section className="py-32 px-6 lg:px-10 bg-[#FFC107]">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-black leading-tight mb-10" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2.8rem, 6vw, 5.5rem)" }}>
-            Not Just Another Beginning
-          </h2>
-          <div className="w-16 h-[3px] bg-black mb-12" />
-          <div className="space-y-7 max-w-3xl">
-            <p className="text-black/75 text-lg leading-relaxed" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Some callings don't knock; they pull. We began with engineering textbooks in hand, but our minds were always somewhere else, on stages, in crowds, in the chaos that makes an event come alive. From different cities and different colleges, we were unknowingly shaped by the same instinct to run toward every fest, every setup, every moment that needed someone to take charge. We didn't choose events; events chose us.
-            </p>
-            <p className="text-black/75 text-lg leading-relaxed" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              One of us had already stepped into the world of events, while the other was quietly learning, observing, and mastering every detail, on different paths but in the same direction. Then came Mira IMS, the right place at the right time, where those paths finally crossed. And when we started working together, it didn't feel like work; it felt like everything had aligned.
-            </p>
-            <p className="text-black/75 text-lg leading-relaxed" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              What people don't see are the 3AM setups, the last-minute changes, the endless coordination that tests every limit you have, but that's where we were built. Chaos taught us composure, and pressure gave us clarity. Somewhere in between all of it, XYZconcepts was born, not just as a company, but as a reflection of everything we believe events should be, intentional, immersive, and flawlessly executed. For us, it's about turning ideas into experiences and making every event feel personal, seamless, and unforgettable.
-            </p>
-            <p className="text-black/75 text-lg leading-relaxed" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Because for us, this was never just a career, and it never will be. And to the one who believed in us before we believed in ourselves, Captain Anand Dandapani (Founder & CEO, Mira IMS Pvt Ltd)
-            </p>
+        <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/10 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 p-7 md:p-9 flex items-end justify-between" style={{ transform: "translateZ(40px)" }}>
+          <div>
+            <h3 className="display-md text-sun">{f.name}</h3>
+            <p className="eyebrow text-white/60 text-[0.6rem] mt-2">{f.role}</p>
           </div>
-          <div className="mt-14 pt-10 border-t-2 border-black/20">
-            <p className="text-black text-xl font-bold tracking-wide mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>Born backstage. Built for the spotlight.</p>
-            <p className="text-black/60 text-sm tracking-[0.2em] uppercase" style={{ fontFamily: "'DM Sans', sans-serif" }}>XYZconcepts &mdash; Your search ends WITH US, literally!</p>
-          </div>
+          <span className="eyebrow text-white/30 text-[0.58rem]">0{i + 1}</span>
         </div>
-      </section>
+        <span className="absolute left-0 bottom-0 h-[3px] w-full bg-sun origin-left scale-x-0 transition-transform duration-700 [transition-timing-function:cubic-bezier(0.76,0,0.24,1)] group-hover:scale-x-100" />
+      </motion.div>
+    </FadeUp>
+  );
+}
 
-      {/* Founders */}
-      <section ref={founderRef} className="py-32 px-6 lg:px-10 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-20">
-            <p className="text-[#FFC107] text-xs tracking-[0.4em] uppercase mb-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>The Founding Duo</p>
-            <h2 className="text-[#111] text-6xl md:text-8xl leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>Meet the<br />Makers</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[
-              { name: "Shreya", role: "Co-founder & Experience Designer", img: FOUNDER_1_IMG, objPos: "center top" },
-              { name: "Vaishali", role: "Co-founder & Creative Director", img: FOUNDER_2_IMG, objPos: "center 20%" },
-            ].map((founder, i) => (
-              <motion.div
-                key={i}
-                className="group overflow-hidden bg-[#F8F8F8]"
-                initial={{ opacity: 0, y: 40 }}
-                animate={founderInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.65, delay: i * 0.18 }}
-              >
-                <div className="relative aspect-[4/5] overflow-hidden">
-                  <img src={founder.img} alt={`${founder.name}, ${founder.role} at XYZconcepts`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" style={{ objectPosition: founder.objPos }} loading="lazy" decoding="async" />
-                </div>
-                <div className="p-10">
-                  <h3 className="text-[#FFC107] text-4xl md:text-5xl mb-2 leading-none" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "0.04em" }}>{founder.name}</h3>
-                  <p className="text-[#111]/40 text-xs tracking-[0.2em] uppercase" style={{ fontFamily: "'DM Sans', sans-serif" }}>{founder.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+function Founders() {
+  return (
+    <section className="relative bg-ink text-paper">
+      <div className="container-x section-y">
+        <SectionHeading eyebrow="The Founding Duo" title={["Meet the", "makers."]} className="mb-16 md:mb-24" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10 max-w-5xl">
+          {FOUNDERS.map((f, i) => <FounderCard key={f.name} f={f} i={i} />)}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      <BeliefsSection />
+function Beliefs() {
+  return (
+    <section className="relative bg-ink-2 text-paper border-t border-white/10">
+      <div className="container-x section-y">
+        <SectionHeading eyebrow="What We Stand For" title={["Five things", "we believe."]} className="mb-16 md:mb-20" />
+        <ol className="border-t border-white/10">
+          {BELIEFS.map((b, i) => (
+            <li key={i} className="group border-b border-white/10">
+              <div className="grid grid-cols-[3rem_1fr] md:grid-cols-[6rem_1fr] gap-6 py-8 md:py-12 items-start">
+                <span className="display-sm text-sun mt-1">0{i + 1}</span>
+                <RevealLines
+                  as="h3"
+                  text={[b]}
+                  className="display-md text-paper transition-colors duration-500 group-hover:text-sun"
+                  style={{ fontSize: "clamp(1.6rem, 4vw, 3.6rem)" }}
+                  amount={0.5}
+                />
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
 
-      {/* Hyderabad CTA */}
-      <section className="py-32 px-6 lg:px-10 text-center bg-[#111]">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-white mb-4" style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "clamp(2rem, 6vw, 6rem)", lineHeight: 1 }}>
-            We don't just get it done. We get it right.
-          </h2>
-          <p className="text-white/40 text-lg leading-relaxed mb-12" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            Every client. Every event. Every time.
-          </p>
-          <Link href="/contact">
-            <span className="inline-block bg-[#FFC107] text-black px-12 py-5 text-sm tracking-[0.2em] uppercase font-bold cursor-pointer hover:bg-yellow-400 transition-colors duration-200" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-              Work With Us →
-            </span>
-          </Link>
+function Closing() {
+  return (
+    <section className="relative bg-sun text-ink overflow-hidden">
+      <div className="container-x section-y">
+        <RevealLines as="h2" text={["We don't just get it done.", "We get it right."]} className="display-lg text-ink max-w-[18ch]" lineClass={(_, i) => (i === 1 ? "text-outline text-outline-ink" : undefined)} />
+        <div className="mt-8 flex items-center gap-6">
+          <DrawLine className="w-16 md:w-24" color="bg-ink" />
+          <RevealWords text="Every client. Every event. Every time." className="font-body text-ink/70 text-lg md:text-2xl italic" delay={0.3} />
         </div>
-      </section>
+        <FadeUp delay={0.5} className="mt-12">
+          <Button href="/contact" variant="ink" size="lg">Work With Us</Button>
+        </FadeUp>
+      </div>
+    </section>
+  );
+}
+
+export default function About() {
+  return (
+    <div className="bg-ink">
+      <PageHero
+        image={heroImg}
+        alt="The XYZconcepts team on site at an event in Hyderabad"
+        eyebrow="The Story"
+        title={["Built by two women", "who refuse to", "do ordinary."]}
+        accentLine={2}
+        position="center 25%"
+        sub={
+          <span className="not-italic">
+            Shreya &amp; Vaishali, Co-founders
+            <span className="block eyebrow text-[0.6rem] text-white/50 mt-2">— XYZconcepts</span>
+          </span>
+        }
+      />
+      <Story />
+      <Founders />
+      <Beliefs />
+      <Closing />
     </div>
   );
 }
