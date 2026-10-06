@@ -19,6 +19,7 @@ export function ParallaxImage({
   position,
   children,
   fill = false,
+  anchor = "center",
 }: {
   src: string;
   alt: string;
@@ -31,13 +32,30 @@ export function ParallaxImage({
   children?: ReactNode;
   /** Stretch to fill a positioned parent instead of sizing itself. */
   fill?: boolean;
+  /**
+   * "center": overscan both ways, image drifts up then down (default).
+   * "top": for subjects near the top edge — faces. The image scales from its
+   * top edge so all overscan sits below, starts fully aligned, and only ever
+   * drifts upward, so the top of the picture is never pushed out of frame
+   * while it is entering or centred.
+   */
+  anchor?: "center" | "top";
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const pct = speed * 50;
-  const y = useTransform(scrollYProgress, [0, 1], [`-${pct}%`, `${pct}%`]);
   const s = scale ?? 1 + speed * 1.1;
+  const pct = speed * 50;
+  // Travel in the image's own percent, which is what motion's y% uses.
+  const topTravel = ((s - 1) / s) * 100;
+  // Top-anchored images hold still while entering and centred (progress ≤ 0.5)
+  // and only start drifting as the section leaves, so faces at the top edge
+  // are never cropped while anyone is actually looking at them.
+  const y = useTransform(
+    scrollYProgress,
+    anchor === "top" ? [0, 0.5, 1] : [0, 1],
+    anchor === "top" ? ["0%", "0%", `-${topTravel}%`] : [`-${pct}%`, `${pct}%`],
+  );
 
   return (
     <div ref={ref} className={`${fill ? "absolute inset-0" : "relative"} overflow-hidden ${className}`}>
@@ -46,7 +64,12 @@ export function ParallaxImage({
         src={src}
         alt={alt}
         className={`absolute inset-0 w-full h-full object-cover ${imgClassName}`}
-        style={{ y: reduced ? 0 : y, scale: reduced ? 1 : s, objectPosition: position }}
+        style={{
+          y: reduced ? 0 : y,
+          scale: reduced ? 1 : s,
+          objectPosition: position ?? (anchor === "top" ? "center top" : undefined),
+          transformOrigin: anchor === "top" ? "50% 0%" : "50% 50%",
+        }}
         loading={priority ? "eager" : "lazy"}
         fetchPriority={priority ? "high" : undefined}
         decoding="async"

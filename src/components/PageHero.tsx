@@ -38,7 +38,8 @@ export default function PageHero({
   const centered = align === "center";
 
   return (
-    <section ref={ref} className={`relative h-[100svh] min-h-[620px] overflow-hidden flex ${centered ? "items-center" : "items-end"}`}>
+    // min-h rather than h: if the copy is ever taller than the viewport the hero grows instead of the text climbing under the nav.
+    <section ref={ref} className={`relative min-h-[100svh] overflow-hidden flex ${centered ? "items-center" : "items-end"}`}>
       <motion.div className="absolute inset-0" style={{ y: bgY, scale: bgScale }}>
         <img src={image} alt={alt} className="w-full h-full object-cover" style={{ objectPosition: position }} fetchPriority="high" decoding="async" />
       </motion.div>
@@ -46,7 +47,7 @@ export default function PageHero({
       <div className="absolute inset-0 bloom" />
 
       <motion.div
-        className={`relative z-10 w-full container-x ${centered ? "text-center pt-24 pb-16" : "pb-14 md:pb-20"}`}
+        className={`relative z-10 w-full container-x ${centered ? "text-center pt-32 pb-16" : "pt-32 pb-14 md:pb-20"}`}
         style={{ y: fgY, opacity: fade }}
       >
         <motion.p

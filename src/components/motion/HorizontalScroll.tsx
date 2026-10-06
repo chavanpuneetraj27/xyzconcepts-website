@@ -65,11 +65,12 @@ export default function HorizontalScroll({
   }
 
   // Height sets how much vertical scroll maps to the horizontal distance.
-  const height = `calc(100vh + ${distance}px)`;
+  const height = `calc(100svh + ${distance}px)`;
 
   return (
     <section ref={sectionRef} className={`relative ${className}`} style={{ height }}>
-      <div className="sticky top-0 h-screen overflow-hidden flex flex-col justify-center">
+      {/* Panels are sized in vh by the caller so header + track + bar fit inside this viewport on short laptops. */}
+      <div className="sticky top-0 h-[100svh] overflow-hidden flex flex-col justify-center">
         {header && <div className="container-x">{header}</div>}
         <motion.div
           ref={trackRef}

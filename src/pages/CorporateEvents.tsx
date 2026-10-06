@@ -160,14 +160,15 @@ function Process() {
           eyebrow="How We Work"
           title={["The XYZ", "Way."]}
           aside={<p>From your first call to the final applause, here's how we make it happen.</p>}
-          className="mb-12 lg:mb-16"
+          className="mb-12 lg:mb-10"
+          size="md"
         />
       }
     >
       {STEPS.map((step, i) => (
         <article
           key={step.num}
-          className="group relative flex-none snap-start w-[82vw] sm:w-[58vw] lg:w-[36vw] min-h-[52vh] lg:min-h-[56vh] border border-white/10 p-7 md:p-10 flex flex-col justify-between bg-ink-2 hover:bg-ink-3 transition-colors duration-500"
+          className="group relative flex-none snap-start w-[82vw] sm:w-[58vw] lg:w-[36vw] min-h-[52vh] lg:min-h-0 lg:h-[52svh] border border-white/10 p-7 md:p-10 flex flex-col justify-between bg-ink-2 hover:bg-ink-3 transition-colors duration-500"
         >
           <div className="flex items-start justify-between">
             <span className="display-xl text-outline leading-none" style={{ fontSize: "clamp(4rem, 9vw, 8rem)" }}>{step.num}</span>

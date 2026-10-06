@@ -90,7 +90,7 @@ function Hero() {
   const { ref, bgY, bgScale, fgY, fade } = useHeroParallax();
 
   return (
-    <section ref={ref} className="relative h-[100svh] min-h-[640px] overflow-hidden flex items-end">
+    <section ref={ref} className="relative min-h-[100svh] overflow-hidden flex items-end">
       {/* Stage backdrop: image sinks and zooms as you leave, so the copy appears to lift off it. */}
       <motion.div className="absolute inset-0" style={{ y: bgY, scale: bgScale }}>
         <img
@@ -104,7 +104,7 @@ function Hero() {
       <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/20" />
       <div className="absolute inset-0 bloom" />
 
-      <motion.div className="relative z-10 w-full container-x pb-14 md:pb-20" style={{ y: fgY, opacity: fade }}>
+      <motion.div className="relative z-10 w-full container-x pt-32 pb-14 md:pb-20" style={{ y: fgY, opacity: fade }}>
         <motion.p
           className="eyebrow text-sun mb-7 md:mb-10"
           initial={{ opacity: 0, y: 12 }}
@@ -193,20 +193,20 @@ function Services() {
         </div>
       </div>
 
-      {/* Stacking service panels */}
-      <div className="relative pb-[10vh]">
+      {/* Stacking service panels (desktop); plain sequence on touch */}
+      <div className="relative pb-6 lg:pb-[10vh]">
         {SERVICES.map((s, i) => (
           <StackCard key={s.num} index={i} total={SERVICES.length} height="92vh" top="9vh">
             <div className="container-x">
               <Link
                 href={s.href}
-                className="group relative grid grid-cols-1 lg:grid-cols-12 bg-ink-3 border border-white/10 overflow-hidden min-h-[70vh] lg:min-h-[78vh]"
+                className="group relative grid grid-cols-1 lg:grid-cols-12 bg-ink-3 border border-white/10 overflow-hidden lg:h-[78vh]"
               >
                 <ParallaxImage
                   src={s.img}
                   alt={`${s.title} organised by XYZconcepts, Hyderabad`}
                   speed={0.12}
-                  className="lg:col-span-7 min-h-[42vh] lg:min-h-full"
+                  className="lg:col-span-7 h-[38vh] min-h-[220px] lg:h-full"
                   imgClassName="transition-transform duration-[1.4s] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.04]"
                 >
                   <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-ink-3" />
@@ -241,8 +241,8 @@ function Services() {
 function Manifesto() {
   return (
     <section className="relative bg-ink-2 noise">
-      <div className="min-h-[200vh]">
-        <div className="sticky top-0 h-screen flex items-center">
+      <div className="min-h-[200svh]">
+        <div className="sticky top-0 h-[100svh] flex items-center">
           <div className="container-x w-full">
             <FadeUp><p className="eyebrow text-sun mb-10">Our Belief</p></FadeUp>
             <ScrubText
@@ -276,10 +276,10 @@ function Stats() {
           ))}
         </div>
       </div>
-      {/* Big ghost word drifting behind */}
-      <div className="pointer-events-none absolute -bottom-[0.25em] left-0 right-0 overflow-hidden" aria-hidden>
+      {/* Big ghost word in its own band below the numbers, bleeding off the bottom edge — never under the figures. */}
+      <div className="pointer-events-none -mt-[var(--section-y)] pt-6 -mb-[0.28em] overflow-hidden" aria-hidden>
         <Marquee baseVelocity={0.5} reactive={false}>
-          <span className="display-xl text-outline opacity-[0.08] mx-8" style={{ fontSize: "clamp(8rem, 22vw, 22rem)", WebkitTextStrokeColor: "#0a0a0a" }}>XYZCONCEPTS&nbsp;XYZCONCEPTS&nbsp;</span>
+          <span className="display-xl text-outline opacity-[0.1] mx-8 leading-none" style={{ fontSize: "clamp(6rem, 18vw, 18rem)", WebkitTextStrokeColor: "#0a0a0a" }}>XYZCONCEPTS&nbsp;XYZCONCEPTS&nbsp;</span>
         </Marquee>
       </div>
     </section>
@@ -291,10 +291,11 @@ function Showcase() {
     <HorizontalScroll
       className="bg-ink text-paper py-[var(--section-y)] lg:py-0"
       header={
-        <div className="mb-10 lg:mb-14 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+        <div className="mb-10 lg:mb-10 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
           <div className="md:col-span-8">
             <FadeUp><p className="eyebrow text-sun mb-5">Every Occasion</p></FadeUp>
-            <RevealLines as="h2" text={["Designed", "to be felt."]} className="display-lg text-paper" />
+            {/* display-md here: inside the pinned viewport the header must leave room for the panels on short laptops. */}
+            <RevealLines as="h2" text={["Designed", "to be felt."]} className="display-lg lg:display-md text-paper" />
           </div>
           <FadeUp className="md:col-span-4 md:justify-self-end eyebrow text-white/35 text-[0.6rem]" delay={0.2}>
             <span className="hidden lg:inline">Scroll to explore</span>
@@ -306,7 +307,7 @@ function Showcase() {
       {SHOWCASE.map((p) => (
         <figure
           key={p.num}
-          className="group relative flex-none snap-start w-[78vw] sm:w-[60vw] lg:w-[34vw] aspect-[3/4] overflow-hidden"
+          className="group relative flex-none snap-start w-[78vw] sm:w-[60vw] aspect-[3/4] lg:w-auto lg:h-[54svh] overflow-hidden"
         >
           <img
             src={p.img}
@@ -323,7 +324,7 @@ function Showcase() {
           </figcaption>
         </figure>
       ))}
-      <div className="flex-none snap-start w-[60vw] sm:w-[40vw] lg:w-[24vw] aspect-[3/4] flex flex-col justify-end p-6 md:p-8 border border-white/10">
+      <div className="flex-none snap-start w-[60vw] sm:w-[40vw] aspect-[3/4] lg:w-auto lg:h-[54svh] flex flex-col justify-end p-6 md:p-8 border border-white/10">
         <p className="font-body text-white/50 leading-relaxed mb-7">Every event here was designed to be remembered, not just attended.</p>
         <Button href="/portfolio" variant="ghost-light">See the Work</Button>
       </div>
@@ -367,11 +368,11 @@ function Founders() {
         <div className="lg:col-span-6 relative min-h-[70vh] lg:min-h-[100vh] duotone-wrap">
           <ParallaxImage
             fill
+            anchor="top"
             src={foundersImg}
             alt="Shreya and Vaishali, co-founders of XYZconcepts event management, Hyderabad"
-            speed={0.18}
+            speed={0.07}
             imgClassName="duotone"
-            position="center 20%"
           >
             <div className="absolute inset-0 bg-gradient-to-t from-ink via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-ink" />
           </ParallaxImage>
